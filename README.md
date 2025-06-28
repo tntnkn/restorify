@@ -7,6 +7,7 @@ Convert json objects and files into python objects of type that you need.
 The code below will convert json list into `list`, `tuple` and `set` respectively.
 ```python
 from restorify import restore
+
 j1 = """
 [
 	1, 2, 3, 1

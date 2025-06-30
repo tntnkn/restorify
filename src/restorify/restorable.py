@@ -1,8 +1,17 @@
 import dataclasses
 import json
 from pathlib import Path
+from contextlib import contextmanager
 
 import restorify.utils as _u
+
+
+@contextmanager
+def all_exceptions_caught(*args, **kwargs):
+    try:
+        yield None
+    except:
+        pass
 
 
 __classes_map = {}
@@ -63,35 +72,28 @@ def _from_dict(cls, val: dict):
     return _from_object(cls, val)
 
 def _from_object(cls, val: object):
-    try:
+    with all_exceptions_caught():
         ann_dict = cls.__annotations__
         types_list = [ ann_dict[k] if k in ann_dict else type(val[k]) for k in val.keys() ]
         d = {  k:t(v) for k, v, t in zip(val.keys(), val.values(), types_list) }
         return cls(**d) #is classable (class, dataclass, function)
-    except:
-        (...)
 
-    try:
+    with all_exceptions_caught():
         view = val.items()
         _ = iter(view) #safelly check if the view is iterable
-        try:
+
+        with all_exceptions_caught():
             type_of_dict_key, type_of_dict_val = cls.__args__[0:2]
             return cls({ _from_object(type_of_dict_key, k):_from_object(type_of_dict_val, v) for k,v in view })
-        except:
-            (...)
-        try:
+
+        with all_exceptions_caught():
             type_of_dict_key = cls.__args__[0]
             return cls({ _from_object(type_of_dict_key, k):_from_object(type(v), v) for k,v in view })
-        except:
-            (...)
-        try:
+
+        with all_exceptions_caught():
             return cls({ _from_object(type(k), k):_from_object(type(v), v) for k,v in view })
-        except:
-            (...)
-    except:
-        (...)
-        
-    try:
+
+    with all_exceptions_caught():
         _ = iter(val) #safelly check if val is iterable
         types_list = list(cls.__args__)
         if len(types_list) == 1:
@@ -101,12 +103,8 @@ def _from_object(cls, val: object):
         else:
             types_list += [ type(v) for v in val[len(types_list):] ]
         return cls( [ _from_object(t, v) for t, v in zip(types_list, val) ] )
-    except Exception as e:
-        (...)
 
-    try:
+    with all_exceptions_caught():
         return cls(val) #base case
-    except:
-        (...)
 
     raise TypeError(f"Cannot create class of type {cls.__name__} with value {str(val)}.") #whaaaaaaa...?

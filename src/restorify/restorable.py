@@ -64,12 +64,10 @@ def _from_dict(cls, val: dict):
 
 def _from_object(cls, val: object):
     try:
-        ann =  cls.__annotations__
-        d = {}
-        for k,v in ann.items():
-            e = _from_object(v, val[k])
-            d[k] = e
-        return cls(**d) #is dataclass?
+        ann_dict = cls.__annotations__
+        types_list = [ ann_dict[k] if k in ann_dict else type(val[k]) for k in val.keys() ]
+        d = {  k:t(v) for k, v, t in zip(val.keys(), val.values(), types_list) }
+        return cls(**d) #is type-annotated, like function or dataclass?
     except:
         (...)
 

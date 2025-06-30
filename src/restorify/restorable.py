@@ -74,9 +74,14 @@ def _from_dict(cls, val: dict):
 def _from_object(cls, val: object):
     with all_exceptions_caught():
         ann_dict = cls.__annotations__
-        types_list = [ ann_dict[k] if k in ann_dict else type(val[k]) for k in val.keys() ]
-        d = {  k:t(v) for k, v, t in zip(val.keys(), val.values(), types_list) }
-        return cls(**d) #is classable (class, dataclass, function)
+        with all_exceptions_caught():
+            #classable is made from dict
+            types_list = [ ann_dict[k] if k in ann_dict else type(val[k]) for k in val.keys() ]
+            d = {  k:_from_object(t,v) for k, v, t in zip(val.keys(), val.values(), types_list) }
+            return cls(**d)
+        with all_exceptions_caught():
+            #classable is made from list
+            return cls( *_from_object(list, val) )
 
     with all_exceptions_caught():
         view = val.items()

@@ -105,8 +105,8 @@ def _from_object(cls, val: object):
         (...)
 
     try:
-        return cls(val)
+        return cls(val) #base case
     except:
         (...)
 
-    raise TypeError(f"Cannot create class of type {cls.__name__} with value {str(val)}.")
+    raise TypeError(f"Cannot create class of type {cls.__name__} with value {str(val)}.") #whaaaaaaa...?

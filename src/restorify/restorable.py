@@ -67,10 +67,30 @@ def _from_object(cls, val: object):
         ann_dict = cls.__annotations__
         types_list = [ ann_dict[k] if k in ann_dict else type(val[k]) for k in val.keys() ]
         d = {  k:t(v) for k, v, t in zip(val.keys(), val.values(), types_list) }
-        return cls(**d) #is type-annotated, like function or dataclass?
+        return cls(**d) #is classable (class, dataclass, function)
     except:
         (...)
 
+    try:
+        view = val.items()
+        _ = iter(view) #safelly check if the view is iterable
+        try:
+            type_of_dict_key, type_of_dict_val = cls.__args__[0:2]
+            return cls({ _from_object(type_of_dict_key, k):_from_object(type_of_dict_val, v) for k,v in view })
+        except:
+            (...)
+        try:
+            type_of_dict_key = cls.__args__[0]
+            return cls({ _from_object(type_of_dict_key, k):_from_object(type(v), v) for k,v in view })
+        except:
+            (...)
+        try:
+            return cls({ _from_object(type(k), k):_from_object(type(v), v) for k,v in view })
+        except:
+            (...)
+    except:
+        (...)
+        
     try:
         type_of_list_element = cls.__args__[0]
         l = [ _from_object(type_of_list_element, x) for x in val ]
@@ -78,11 +98,7 @@ def _from_object(cls, val: object):
     except:
         (...)
 
-    try:
-        type_of_dict_key, type_of_dict_val = cls.__args__
-        return cls({ _from_object(type_of_dict_key, k):_from_object(type_of_dict_val, v) for k,v in val.items() })
-    except:
-        (...)
+
 
     try:
         return cls(val)

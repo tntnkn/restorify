@@ -92,13 +92,17 @@ def _from_object(cls, val: object):
         (...)
         
     try:
-        type_of_list_element = cls.__args__[0]
-        l = [ _from_object(type_of_list_element, x) for x in val ]
-        return cls(l)
-    except:
+        _ = iter(val) #safelly check if val is iterable
+        types_list = list(cls.__args__)
+        if len(types_list) == 1:
+            types_list *= len(val)
+        elif len(types_list) > len(val):
+            types_list = types_list[0:len(val)]
+        else:
+            types_list += [ type(v) for v in val[len(types_list):] ]
+        return cls( [ _from_object(t, v) for t, v in zip(types_list, val) ] )
+    except Exception as e:
         (...)
-
-
 
     try:
         return cls(val)

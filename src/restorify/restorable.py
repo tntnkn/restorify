@@ -75,6 +75,15 @@ def _from_object(cls, val: object):
     with all_exceptions_caught():
         ann_dict = cls.__annotations__
         with all_exceptions_caught():
+            #classable is made from args and kwargs
+            args, kwargs = val #implicit check for two elements
+            args   = _from_object(list, args)
+            kwargs = _from_object(dict, kwargs)
+            with all_exceptions_caught():
+                return cls( *args, **kwags )
+            with all_exceptions_caught():
+                return cls(args, kwags)
+        with all_exceptions_caught():
             #classable is made from dict
             types_list = [ ann_dict[k] if k in ann_dict else type(val[k]) for k in val.keys() ]
             d = {  k:_from_object(t,v) for k, v, t in zip(val.keys(), val.values(), types_list) }
@@ -86,15 +95,12 @@ def _from_object(cls, val: object):
     with all_exceptions_caught():
         view = val.items()
         _ = iter(view) #safelly check if the view is iterable
-
         with all_exceptions_caught():
             type_of_dict_key, type_of_dict_val = cls.__args__[0:2]
             return cls({ _from_object(type_of_dict_key, k):_from_object(type_of_dict_val, v) for k,v in view })
-
         with all_exceptions_caught():
             type_of_dict_key = cls.__args__[0]
             return cls({ _from_object(type_of_dict_key, k):_from_object(type(v), v) for k,v in view })
-
         with all_exceptions_caught():
             return cls({ _from_object(type(k), k):_from_object(type(v), v) for k,v in view })
 

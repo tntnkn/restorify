@@ -80,9 +80,9 @@ def _from_object(cls, val: object):
             args   = _from_object(list, args)
             kwargs = _from_object(dict, kwargs)
             with all_exceptions_caught():
-                return cls( *args, **kwags )
+                return cls( *args, **kwargs )
             with all_exceptions_caught():
-                return cls(args, kwags)
+                return cls(args, kwargs)
         with all_exceptions_caught():
             #classable is made from dict
             types_list = [ ann_dict[k] if k in ann_dict else type(val[k]) for k in val.keys() ]

@@ -133,3 +133,6 @@ The `restorable_class.json` file contents is the following:
     ]
 }
 ```
+
+## Failed conversion
+Upon failed conversion `TypeError` is raised.

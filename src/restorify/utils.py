@@ -14,6 +14,8 @@ class CustomJsonEncoder(json.JSONEncoder):
     def default(self, obj):
         if hasattr(obj, 'to_dict'):
             return obj.to_dict()
+        if isinstance(obj, Path):
+           return str(obj)
         return super().default(obj)
     
 def write_json(what: dict, where: Path, how: str = "w"):
